@@ -30,7 +30,7 @@ def evaluate_polynomial(x, coefficients):
         y += coef * (x ** (len(coefficients) - 1 - i))
     
     # Clamp the result between 1 and 32
-    return max(1, min(32, round(y)))
+    return max(0, min(31, round(y)))
 
 def create_character_grid(message):
     """
@@ -50,11 +50,10 @@ def create_character_grid(message):
     coefficients = generate_polynomial()
     
     # Place message characters along polynomial path
-    # TODO I am being stupid why can't I figure this out
     for x in range(256):
-        y = evaluate_polynomial(x + 1, coefficients)  # +1 to avoid x=0
-        print(y)
-        grid[y][x-1] = message[x]  # -1 for 0-based indexing
+        y = evaluate_polynomial(x, coefficients)  # +1 to avoid x=0
+        #print(y)
+        grid[y][x] = message[x]  # -1 for 0-based indexing
     
     return grid, coefficients
 
@@ -77,6 +76,8 @@ def save_grid_to_file(grid, filename="encrypted_message.txt"):
 
 # Example usage
 if __name__ == "__main__":
+    # A settable seed for repeatable trials
+    random.seed(42)
     # Test message
     test_message = "Hello, this is a secret message!"
     
@@ -86,6 +87,15 @@ if __name__ == "__main__":
             
     save_grid_to_file(grid)
     print("\nPolynomial coefficients:", coefficients)
+
+    # Decrypt
+    indices = []
+    for x in range(256):
+        indices.append([x, evaluate_polynomial(x, coefficients)])
     
-    # Verify
-    # assert test_message == decrypted, "Encryption/decryption failed!"
+    decrypted = ''
+    for x, y in indices:
+        decrypted += grid[y][x]
+    print("Decrypted Message:", decrypted)
+    # Verify (we have to strip the padding from the decrypted string)
+    assert test_message == decrypted.rstrip(), "Encryption/decryption failed!"
