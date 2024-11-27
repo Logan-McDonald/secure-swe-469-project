@@ -6,6 +6,8 @@ def generate_polynomial():
     """
     Generates a random polynomial of degree 3-5 that maps x values 1-256 to y values 1-32
     Returns the coefficients of the polynomial
+    
+    Generally, this approach would benefit from more high-frequency functions
     """
     degree = random.randint(3, 5)
     coefficients = []
@@ -30,7 +32,7 @@ def evaluate_polynomial(x, coefficients):
         y += coef * (x ** (len(coefficients) - 1 - i))
     
     # Clamp the result between 1 and 32
-    return max(0, min(31, round(y)))
+    return round(y) % 32 #max(0, min(31, round(y)))
 
 def create_character_grid(message):
     """
@@ -41,7 +43,7 @@ def create_character_grid(message):
         raise ValueError("Message must be 256 characters or less")
     
     # Pad message to full length with spaces
-    message = message.ljust(256)
+    #message = message.ljust(256)
     
     # Create grid filled with random characters
     grid = np.array([[random.choice(string.printable[:-5]) for _ in range(256)] for _ in range(32)])
@@ -50,7 +52,7 @@ def create_character_grid(message):
     coefficients = generate_polynomial()
     
     # Place message characters along polynomial path
-    for x in range(256):
+    for x in range(len(message)):
         y = evaluate_polynomial(x, coefficients)  # +1 to avoid x=0
         #print(y)
         grid[y][x] = message[x]  # -1 for 0-based indexing
@@ -80,6 +82,7 @@ if __name__ == "__main__":
     random.seed(42)
     # Test message
     test_message = "Hello, this is a secret message!"
+    test_message = "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since."
     
     # Encrypt
     print("Original message:", test_message)
@@ -98,4 +101,4 @@ if __name__ == "__main__":
         decrypted += grid[y][x]
     print("Decrypted Message:", decrypted)
     # Verify (we have to strip the padding from the decrypted string)
-    assert test_message == decrypted.rstrip(), "Encryption/decryption failed!"
+    assert test_message in decrypted, "Encryption/decryption failed!"
