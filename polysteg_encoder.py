@@ -13,12 +13,12 @@ def generate_polynomial():
     coefficients = []
     
     # Generate random coefficients, but ensure they're small enough to keep values in range
-    coefficients.append(random.uniform(-0.0001, 0.0001))  # x^n coefficient
+    coefficients.append(random.uniform(-0.0125, 0.0125))  # x^n coefficient
     for _ in range(degree - 1):
-        coefficients.append(random.uniform(-0.01, 0.01))
+        coefficients.append(random.uniform(-0.125, 0.125))
     
     # Add constant term to ensure values stay mostly within range
-    coefficients.append(random.uniform(10, 20))
+    coefficients.append(random.uniform(8, 24))
     
     return coefficients
 
@@ -29,7 +29,7 @@ def evaluate_polynomial(x, coefficients):
     """
     y = 0
     for i, coef in enumerate(coefficients):
-        y += coef * (x ** (len(coefficients) - 1 - i))
+        y += coef * ((x-127) ** (len(coefficients) - 1 - i))
     
     # Clamp the result between 1 and 32
     return round(y) % 32 #max(0, min(31, round(y)))
@@ -79,7 +79,7 @@ def save_grid_to_file(grid, filename="encrypted_message.txt"):
 # Example usage
 if __name__ == "__main__":
     # A settable seed for repeatable trials
-    random.seed(42)
+    random.seed(27)
     # Test message
     test_message = "Hello, this is a secret message!"
     test_message = "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since."
