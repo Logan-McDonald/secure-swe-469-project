@@ -115,6 +115,46 @@ def decrypt(grid, coefficients):
     
     return decrypted
 
+def plot_polynomial_with_grid(coefficients, grid, message):
+    """
+    Plots a polynomial based on given coefficients and overlays characters from a grid.
+    """
+    # Generate x values within the range 0 to 256
+    x = np.array(range(256))
+    # Compute the polynomial values for the x range
+    y = np.array([evaluate_polynomial(x_val, coefficients) for x_val in x])
+
+    # Clip y values to the range (0, 32)
+    #y = np.clip(y, -32, 0)
+
+    # Create the plot
+    plt.figure(figsize=(14, 8))
+    plt.plot(x, y, color='blue', label=f"Polynomial: {np.poly1d(coefficients)}", linewidth=1)
+    plt.xlim(0, 256)
+    plt.ylim(0, 32)
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Polynomial Graph with Grid Overlay")
+    plt.legend()
+    plt.grid(False)
+
+    # Overlay the grid characters
+    message_index = 0
+    ax = plt.gca()
+    for i in range(256):  # Iterate over grid columns
+        for j in range(32):  # Iterate over grid rows
+            char = grid[j][i]
+            text_color = 'black'
+            if message_index < len(message) and char == message[message_index] and j == evaluate_polynomial(i, coefficients):
+                text_color = 'red'
+                rect = plt.Rectangle((i - 0.5, j - 0.5), 1, 1, linewidth=1, edgecolor='red', facecolor='none')
+                ax.add_patch(rect)
+                message_index += 1
+            if char != '\n':  # Only draw non-whitespace characters
+                plt.text(i, j, char, fontsize=8, ha='center', va='center', color=text_color)
+
+    plt.show()
+
 # Example usage
 if __name__ == "__main__":
     # A settable seed for repeatable trials
@@ -131,7 +171,7 @@ if __name__ == "__main__":
         grid, coefficients = create_character_grid(test_message)
 
         save_grid_to_file(grid, filename=opt_file if opt_file else "encrypted_message.txt")
-        plot_polynomial(coefficients)
+        plot_polynomial_with_grid(coefficients, grid, test_message)
         
         key = ' '.join([str(c) for c in coefficients])
         print("\nPolynomial coefficients:", key)
