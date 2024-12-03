@@ -60,13 +60,6 @@ def create_character_grid(message):
     return grid, coefficients
 
 def save_grid_to_file(grid, filename="encrypted_message.txt"):
-    """
-    Takes a grid from create_character_grid and saves it to a text file
-    
-    Parameters:
-        grid (numpy.ndarray): The 256x32 character grid
-        filename (str): The name of the output file (default: encrypted_message.txt)
-    """
     try:
         with open(filename, 'w', encoding='utf-8') as f:
             # Write each row of the grid as a single line
@@ -75,22 +68,19 @@ def save_grid_to_file(grid, filename="encrypted_message.txt"):
         print(f"Grid successfully saved to {filename}")
     except Exception as e:
         print(f"Error saving grid to file: {e}")
-
-# Example usage
-if __name__ == "__main__":
-    # A settable seed for repeatable trials
-    random.seed(27)
-    # Test message
-    test_message = "Hello, this is a secret message!"
-    test_message = "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since."
-    
-    # Encrypt
-    print("Original message:", test_message)
-    grid, coefficients = create_character_grid(test_message)
-            
-    save_grid_to_file(grid)
-    print("\nPolynomial coefficients:", coefficients)
-
+        
+def read_grid_from_file(filename="encrypted_message.txt"):
+    grid = None
+    try:
+        with open(filename, 'r', encoding='utf-8') as f:
+            # Write each row of the grid as a single line
+            grid = f.readlines()
+        print(f"Grid successfully saved to {filename}")
+        return grid
+    except Exception as e:
+        print(f"Error saving grid to file: {e}")
+        
+def decrypt(grid, coefficients):
     # Decrypt
     indices = []
     for x in range(256):
@@ -99,6 +89,39 @@ if __name__ == "__main__":
     decrypted = ''
     for x, y in indices:
         decrypted += grid[y][x]
-    print("Decrypted Message:", decrypted)
-    # Verify (we have to strip the padding from the decrypted string)
-    assert test_message in decrypted, "Encryption/decryption failed!"
+    
+    return decrypted
+
+# Example usage
+if __name__ == "__main__":
+    # A settable seed for repeatable trials
+    random.seed(27)
+    # Test message
+    method = input("Encrypt or Decrypt message? (E for encrypt, D for decrypt): ").lower()
+    
+    if method == 'e':
+        # Encrypt
+        test_message = input("Enter the message to be encrypted: ")
+        opt_file = input("What file would you like to output to? (Leave empty for default): ")
+        
+        print("Original message:", test_message)
+        grid, coefficients = create_character_grid(test_message)
+
+        save_grid_to_file(grid, filename=opt_file if opt_file else "encrypted_message.txt")
+        print("\nPolynomial coefficients:", str(coefficients).replace(",", ""))
+    elif method == 'd':
+        # Decrypt
+        
+        opt_file = input("What file would you like to decrypt? (Leave empty for default): ")
+        coefficients = input("Enter key (coefficients from highest to lowest power like such: 5 4 3 2 1)")
+        
+        decrypted = decrypt(grid = read_grid_from_file(filename=opt_file if opt_file else "encrypted_message.txt"), 
+                            coefficients=[float(c) for c in coefficients.split(" ")])
+        
+        print("Decrypted Message:", decrypted)
+           
+    # assert test_message in decrypted, "Encryption/decryption failed!"
+            
+    
+
+    
