@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import string
+import matplotlib.pyplot as plt
 
 def generate_polynomial():
     """
@@ -43,7 +44,7 @@ def create_character_grid(message):
         raise ValueError("Message must be 256 characters or less")
     
     # Pad message to full length with spaces
-    #message = message.ljust(256)
+    # message = message.ljust(256)
     
     # Create grid filled with random characters
     grid = np.array([[random.choice(string.printable[:-5]) for _ in range(256)] for _ in range(32)])
@@ -60,6 +61,9 @@ def create_character_grid(message):
     return grid, coefficients
 
 def save_grid_to_file(grid, filename="encrypted_message.txt"):
+    """
+    Saves the passed in "grid" to specified or default "filename"
+    """
     try:
         with open(filename, 'w', encoding='utf-8') as f:
             # Write each row of the grid as a single line
@@ -70,19 +74,38 @@ def save_grid_to_file(grid, filename="encrypted_message.txt"):
         print(f"Error saving grid to file: {e}")
         
 def read_grid_from_file(filename="encrypted_message.txt"):
+    """
+    Reads from the passed in or default "filename" and puts it into
+    a list variable
+    """
     grid = None
     try:
         with open(filename, 'r', encoding='utf-8') as f:
-            # Write each row of the grid as a single line
+            # Read each row of the file as a single line
             grid = f.readlines()
-        print(f"Grid successfully saved to {filename}")
+        print(f"Grid successfully read from {filename}")
         return grid
     except Exception as e:
-        print(f"Error saving grid to file: {e}")
+        print(f"Error reading grid from file: {e}")
         
 def decrypt(grid, coefficients):
+    """
+    Decrypts grid variable using coefficients as the key
+    """
     # Decrypt
     indices = []
+    
+    # Check if grid is valid size
+    try:
+        for row in grid[:32]:
+            # print(row)
+            # print(len(row))
+            if len(row) != 257:
+                raise Exception("Grid is not valid size")
+    except Exception as e:
+        print(e)
+        return
+    
     for x in range(256):
         indices.append([x, evaluate_polynomial(x, coefficients)])
     
@@ -95,30 +118,35 @@ def decrypt(grid, coefficients):
 # Example usage
 if __name__ == "__main__":
     # A settable seed for repeatable trials
-    random.seed(27)
-    # Test message
+    # random.seed(27)
+    
     method = input("Encrypt or Decrypt message? (E for encrypt, D for decrypt): ").lower()
     
     if method == 'e':
         # Encrypt
-        test_message = input("Enter the message to be encrypted: ")
+        test_message = input("Enter the message to be encrypted (max size is 256 characters): ")
         opt_file = input("What file would you like to output to? (Leave empty for default): ")
         
         print("Original message:", test_message)
         grid, coefficients = create_character_grid(test_message)
 
         save_grid_to_file(grid, filename=opt_file if opt_file else "encrypted_message.txt")
-        print("\nPolynomial coefficients:", str(coefficients).replace(",", ""))
+        plot_polynomial(coefficients)
+        
+        key = ' '.join([str(c) for c in coefficients])
+        print("\nPolynomial coefficients:", key)
     elif method == 'd':
         # Decrypt
         
         opt_file = input("What file would you like to decrypt? (Leave empty for default): ")
-        coefficients = input("Enter key (coefficients from highest to lowest power like such: 5 4 3 2 1)")
+        coefficients = input("Enter key (coefficients from highest to lowest power like such: 5 4 3 2 1): ")
         
         decrypted = decrypt(grid = read_grid_from_file(filename=opt_file if opt_file else "encrypted_message.txt"), 
                             coefficients=[float(c) for c in coefficients.split(" ")])
         
         print("Decrypted Message:", decrypted)
+    else:
+        print("Please retry and enter either E or D")
            
     # assert test_message in decrypted, "Encryption/decryption failed!"
             
