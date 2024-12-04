@@ -33,7 +33,7 @@ def evaluate_polynomial(x, coefficients):
         y += coef * ((x-127) ** (len(coefficients) - 1 - i))
     
     # Clamp the result between 1 and 32
-    return round(y) % 32 #max(0, min(31, round(y)))
+    return round(y) % 32
 
 def create_character_grid(message):
     """
@@ -42,9 +42,6 @@ def create_character_grid(message):
     """
     if len(message) > 256:
         raise ValueError("Message must be 256 characters or less")
-    
-    # Pad message to full length with spaces
-    # message = message.ljust(256)
     
     # Create grid filled with random characters
     grid = np.array([[random.choice(string.printable[:-5]) for _ in range(256)] for _ in range(32)])
@@ -55,7 +52,6 @@ def create_character_grid(message):
     # Place message characters along polynomial path
     for x in range(len(message)):
         y = evaluate_polynomial(x, coefficients)  # +1 to avoid x=0
-        #print(y)
         grid[y][x] = message[x]  # -1 for 0-based indexing
     
     return grid, coefficients
@@ -92,14 +88,11 @@ def decrypt(grid, coefficients):
     """
     Decrypts grid variable using coefficients as the key
     """
-    # Decrypt
     indices = []
     
     # Check if grid is valid size
     try:
         for row in grid[:32]:
-            # print(row)
-            # print(len(row))
             if len(row) != 257:
                 raise Exception("Grid is not valid size")
     except Exception as e:
@@ -123,9 +116,6 @@ def plot_polynomial_with_grid(coefficients, grid, message):
     x = np.array(range(256))
     # Compute the polynomial values for the x range
     y = np.array([evaluate_polynomial(x_val, coefficients) for x_val in x])
-
-    # Clip y values to the range (0, 32)
-    #y = np.clip(y, -32, 0)
 
     # Create the plot
     plt.figure(figsize=(14, 8))
@@ -155,11 +145,7 @@ def plot_polynomial_with_grid(coefficients, grid, message):
 
     plt.show()
 
-# Example usage
 if __name__ == "__main__":
-    # A settable seed for repeatable trials
-    # random.seed(27)
-    
     method = input("Encrypt or Decrypt message? (E for encrypt, D for decrypt): ").lower()
     
     if method == 'e':
@@ -177,7 +163,6 @@ if __name__ == "__main__":
         print("\nPolynomial coefficients:", key)
     elif method == 'd':
         # Decrypt
-        
         opt_file = input("What file would you like to decrypt? (Leave empty for default): ")
         coefficients = input("Enter key (coefficients from highest to lowest power like such: 5 4 3 2 1): ")
         
@@ -187,8 +172,6 @@ if __name__ == "__main__":
         print("Decrypted Message:", decrypted)
     else:
         print("Please retry and enter either E or D")
-           
-    # assert test_message in decrypted, "Encryption/decryption failed!"
             
     
 
