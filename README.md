@@ -12,7 +12,7 @@ of our project while also doing research to highlight the background and integri
 
 ## Execution
 To excute this python code, you first need to have Python 3 or greater installed. You also need to be using python
-3.10.8 as the interpreter version.
+3.10.8 as the interpreter version. (It may work with other versions of python, but this is the recommended version.)
 
 ### Procedure
 1. Open a terminal in the same directory as `polysteg.py`
@@ -21,3 +21,9 @@ To excute this python code, you first need to have Python 3 or greater installed
 4. From there, you will be prompted to either encode text or decode a file.
 
 ### Testing
+To run the tests for this code, you can run the following command:<br>
+`python test_polysteg.py` or `python3 test_polysteg.py`
+
+Results of getting code coverage using the `pytest-cov` library can be seen below:![alt text](artifacts/coverage.png)
+
+The apparent low coverage of `polysteg.py` is due to not testing the user inputs, not testing the exception catch branches, and not testing the `plot_polynomial_with_grid(...)` method.
