@@ -10,6 +10,14 @@ outputs the polynomial key. The decryption algorithm has a user choose a file to
 Taylor and Garret worked on the report. They outlined the problem we wanted to address, motivation, and objectives 
 of our project while also doing research to highlight the background and integrity of the idea we are pursuing.
 
+## Included files
+- README.md
+- polysteg.py
+- test_polysteg.py
+- requirements.txt
+- Screenshots of all relevant artifacts
+
+
 ## Execution
 To excute this python code, you first need to have Python 3 or greater installed. You also need to be using python
 3.10.8 as the interpreter version. (It may work with other versions of python, but this is the recommended version.)
